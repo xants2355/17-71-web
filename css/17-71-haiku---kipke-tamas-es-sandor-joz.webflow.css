@@ -1550,8 +1550,8 @@ figcaption {
 }
 
 .author-comp {
-  grid-column-gap: 2rem;
-  grid-row-gap: 2rem;
+  grid-column-gap: 4rem;
+  grid-row-gap: 4rem;
   flex-flow: column;
   grid-template-rows: auto auto;
   grid-template-columns: 1fr;
