@@ -1469,6 +1469,10 @@ figcaption {
   display: grid;
 }
 
+.event-row.actual-event {
+  color: var(--base-color-brand--black);
+}
+
 .event-wrapper {
   grid-column-gap: 1rem;
   grid-row-gap: 1rem;
