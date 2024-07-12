@@ -1385,7 +1385,6 @@ figcaption {
   flex-flow: row;
   justify-content: center;
   align-items: center;
-  min-height: 100svh;
   padding-top: 7rem;
   font-style: italic;
   display: block;
@@ -1652,7 +1651,7 @@ figcaption {
 .hero-slider {
   color: var(--base-color-brand--dark-grey);
   background-color: rgba(221, 221, 221, 0);
-  height: 640px;
+  min-height: 640px;
 }
 
 .slide-wrapper {
@@ -2316,8 +2315,8 @@ figcaption {
   }
 
   .author-comp {
-    grid-column-gap: 2.5rem;
-    grid-row-gap: 2.5rem;
+    grid-column-gap: 3rem;
+    grid-row-gap: 3rem;
   }
 
   .date-time {
@@ -2440,8 +2439,7 @@ figcaption {
   }
 
   #w-node-_2ab7dd55-e6c9-12b5-38eb-41bcf819ecd3-b318aa27 {
-    grid-row: 5 / 6;
-    grid-column-end: 2;
+    grid-area: 5 / 1 / 6 / 3;
   }
 }
 
