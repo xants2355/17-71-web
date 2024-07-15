@@ -17,7 +17,7 @@
   --background-color--background-warning\<deleted\|variable-0aa1a7ce-e851-b6b5-66db-1a1a96e8e04b\>: var(--base-color-system--warning-yellow);
   --text-color--text-warning: var(--base-color-system--warning-yellow-dark);
   --base-color-brand--black: #37352c;
-  --base-color-brand--dark-grey: #929083;
+  --base-color-brand--dark-grey: #817f73;
   --base-color-neutral--white: #fff;
   --base-color-neutral--black: #000;
   --base-color-brand--blue: #2d62ff;
@@ -126,6 +126,7 @@ h2 {
   margin-top: 0;
   margin-bottom: 0;
   font-size: 3rem;
+  font-style: italic;
   font-weight: 700;
   line-height: 1.2;
 }
@@ -1420,6 +1421,7 @@ figcaption {
 }
 
 .body {
+  color: var(--base-color-brand--black);
   font-style: italic;
   font-weight: 400;
 }
@@ -1492,6 +1494,7 @@ figcaption {
 .author-wrapper {
   grid-column-gap: 1.5rem;
   grid-row-gap: 1.5rem;
+  color: var(--base-color-brand--dark-grey);
   justify-content: flex-start;
   align-items: center;
   max-width: 44rem;
