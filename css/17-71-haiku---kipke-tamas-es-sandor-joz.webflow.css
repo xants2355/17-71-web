@@ -1821,6 +1821,7 @@ figcaption {
 .exibition-lightbox {
   border: 1px solid var(--base-color-brand--dark-grey);
   flex: 1;
+  transition: all .2s cubic-bezier(.77, 0, .175, 1);
   position: relative;
 }
 
@@ -1944,6 +1945,11 @@ figcaption {
 
 .exhibition-image-thumbnail {
   filter: grayscale();
+  transition: all .2s cubic-bezier(.77, 0, .175, 1);
+}
+
+.exhibition-image-thumbnail:hover {
+  filter: none;
 }
 
 @media screen and (max-width: 991px) {
