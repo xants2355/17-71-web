@@ -1609,7 +1609,7 @@ figcaption {
   display: none;
 }
 
-.container-custom56 {
+.container-events {
   width: 100%;
   max-width: 56rem;
   margin-left: auto;
@@ -1820,6 +1820,7 @@ figcaption {
 
 .exibition-lightbox {
   border: 1px solid var(--base-color-brand--dark-grey);
+  flex: 1;
   position: relative;
 }
 
