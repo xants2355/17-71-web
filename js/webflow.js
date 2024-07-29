@@ -12846,6 +12846,546 @@
     }
   });
 
+  // packages/shared/render/plugins/Lightbox/webflow-lightbox.js
+  var require_webflow_lightbox = __commonJS({
+    "packages/shared/render/plugins/Lightbox/webflow-lightbox.js"(exports, module) {
+      "use strict";
+      var Webflow = require_webflow_lib();
+      var CONDITION_INVISIBLE_CLASS = "w-condition-invisible";
+      var CONDVIS_SELECTOR = "." + CONDITION_INVISIBLE_CLASS;
+      function withoutConditionallyHidden(items) {
+        return items.filter(function(item) {
+          return !isConditionallyHidden(item);
+        });
+      }
+      function isConditionallyHidden(item) {
+        return Boolean(item.$el && item.$el.closest(CONDVIS_SELECTOR).length);
+      }
+      function getPreviousVisibleIndex(start, items) {
+        for (var i = start; i >= 0; i--) {
+          if (!isConditionallyHidden(items[i])) {
+            return i;
+          }
+        }
+        return -1;
+      }
+      function getNextVisibleIndex(start, items) {
+        for (var i = start; i <= items.length - 1; i++) {
+          if (!isConditionallyHidden(items[i])) {
+            return i;
+          }
+        }
+        return -1;
+      }
+      function shouldSetArrowLeftInactive(currentIndex, items) {
+        return getPreviousVisibleIndex(currentIndex - 1, items) === -1;
+      }
+      function shouldSetArrowRightInactive(currentIndex, items) {
+        return getNextVisibleIndex(currentIndex + 1, items) === -1;
+      }
+      function setAriaLabelIfEmpty($element, labelText) {
+        if (!$element.attr("aria-label")) {
+          $element.attr("aria-label", labelText);
+        }
+      }
+      function createLightbox(window2, document2, $, container) {
+        var tram = $.tram;
+        var isArray = Array.isArray;
+        var namespace = "w-lightbox";
+        var prefix = namespace + "-";
+        var prefixRegex = /(^|\s+)/g;
+        var items = [];
+        var currentIndex;
+        var $refs;
+        var spinner;
+        var resetVisibilityState = [];
+        function lightbox(thing, index) {
+          items = isArray(thing) ? thing : [thing];
+          if (!$refs) {
+            lightbox.build();
+          }
+          if (withoutConditionallyHidden(items).length > 1) {
+            $refs.items = $refs.empty;
+            items.forEach(function(item, idx) {
+              var $thumbnail = dom("thumbnail");
+              var $item = dom("item").prop("tabIndex", 0).attr("aria-controls", "w-lightbox-view").attr("role", "tab").append($thumbnail);
+              setAriaLabelIfEmpty($item, `show item ${idx + 1} of ${items.length}`);
+              if (isConditionallyHidden(item)) {
+                $item.addClass(CONDITION_INVISIBLE_CLASS);
+              }
+              $refs.items = $refs.items.add($item);
+              loadImage(item.thumbnailUrl || item.url, function($image) {
+                if ($image.prop("width") > $image.prop("height")) {
+                  addClass($image, "wide");
+                } else {
+                  addClass($image, "tall");
+                }
+                $thumbnail.append(addClass($image, "thumbnail-image"));
+              });
+            });
+            $refs.strip.empty().append($refs.items);
+            addClass($refs.content, "group");
+          }
+          tram(
+            // Focus the lightbox to receive keyboard events.
+            removeClass($refs.lightbox, "hide").trigger("focus")
+          ).add("opacity .3s").start({
+            opacity: 1
+          });
+          addClass($refs.html, "noscroll");
+          return lightbox.show(index || 0);
+        }
+        lightbox.build = function() {
+          lightbox.destroy();
+          $refs = {
+            html: $(document2.documentElement),
+            // Empty jQuery object can be used to build new ones using `.add`.
+            empty: $()
+          };
+          $refs.arrowLeft = dom("control left inactive").attr("role", "button").attr("aria-hidden", true).attr("aria-controls", "w-lightbox-view");
+          $refs.arrowRight = dom("control right inactive").attr("role", "button").attr("aria-hidden", true).attr("aria-controls", "w-lightbox-view");
+          $refs.close = dom("control close").attr("role", "button");
+          setAriaLabelIfEmpty($refs.arrowLeft, "previous image");
+          setAriaLabelIfEmpty($refs.arrowRight, "next image");
+          setAriaLabelIfEmpty($refs.close, "close lightbox");
+          $refs.spinner = dom("spinner").attr("role", "progressbar").attr("aria-live", "polite").attr("aria-hidden", false).attr("aria-busy", true).attr("aria-valuemin", 0).attr("aria-valuemax", 100).attr("aria-valuenow", 0).attr("aria-valuetext", "Loading image");
+          $refs.strip = dom("strip").attr("role", "tablist");
+          spinner = new Spinner($refs.spinner, prefixed("hide"));
+          $refs.content = dom("content").append($refs.spinner, $refs.arrowLeft, $refs.arrowRight, $refs.close);
+          $refs.container = dom("container").append($refs.content, $refs.strip);
+          $refs.lightbox = dom("backdrop hide").append($refs.container);
+          $refs.strip.on("click", selector("item"), itemTapHandler);
+          $refs.content.on("swipe", swipeHandler).on("click", selector("left"), handlerPrev).on("click", selector("right"), handlerNext).on("click", selector("close"), handlerHide).on("click", selector("image, caption"), handlerNext);
+          $refs.container.on("click", selector("view"), handlerHide).on("dragstart", selector("img"), preventDefault);
+          $refs.lightbox.on("keydown", keyHandler).on("focusin", focusThis);
+          $(container).append($refs.lightbox);
+          return lightbox;
+        };
+        lightbox.destroy = function() {
+          if (!$refs) {
+            return;
+          }
+          removeClass($refs.html, "noscroll");
+          $refs.lightbox.remove();
+          $refs = void 0;
+        };
+        lightbox.show = function(index) {
+          if (index === currentIndex) {
+            return;
+          }
+          var item = items[index];
+          if (!item) {
+            return lightbox.hide();
+          }
+          if (isConditionallyHidden(item)) {
+            if (index < currentIndex) {
+              var previousVisibleIndex = getPreviousVisibleIndex(index - 1, items);
+              index = previousVisibleIndex > -1 ? previousVisibleIndex : index;
+            } else {
+              var nextVisibleIndex = getNextVisibleIndex(index + 1, items);
+              index = nextVisibleIndex > -1 ? nextVisibleIndex : index;
+            }
+            item = items[index];
+          }
+          var previousIndex = currentIndex;
+          currentIndex = index;
+          $refs.spinner.attr("aria-hidden", false).attr("aria-busy", true).attr("aria-valuenow", 0).attr("aria-valuetext", "Loading image");
+          spinner.show();
+          var url = item.html && svgDataUri(item.width, item.height) || item.url;
+          loadImage(url, function($image) {
+            if (index !== currentIndex) {
+              return;
+            }
+            var $figure = dom("figure", "figure").append(addClass($image, "image"));
+            var $frame = dom("frame").append($figure);
+            var $newView = dom("view").prop("tabIndex", 0).attr("id", "w-lightbox-view").append($frame);
+            var $html;
+            var isIframe;
+            if (item.html) {
+              $html = $(item.html);
+              isIframe = $html.is("iframe");
+              if (isIframe) {
+                $html.on("load", transitionToNewView);
+              }
+              $figure.append(addClass($html, "embed"));
+            }
+            if (item.caption) {
+              $figure.append(dom("caption", "figcaption").text(item.caption));
+            }
+            $refs.spinner.before($newView);
+            if (!isIframe) {
+              transitionToNewView();
+            }
+            function transitionToNewView() {
+              $refs.spinner.attr("aria-hidden", true).attr("aria-busy", false).attr("aria-valuenow", 100).attr("aria-valuetext", "Loaded image");
+              spinner.hide();
+              if (index !== currentIndex) {
+                $newView.remove();
+                return;
+              }
+              const shouldHideLeftArrow = shouldSetArrowLeftInactive(index, items);
+              toggleClass($refs.arrowLeft, "inactive", shouldHideLeftArrow);
+              toggleHidden($refs.arrowLeft, shouldHideLeftArrow);
+              if (shouldHideLeftArrow && $refs.arrowLeft.is(":focus")) {
+                $refs.arrowRight.focus();
+              }
+              const shouldHideRightArrow = shouldSetArrowRightInactive(index, items);
+              toggleClass($refs.arrowRight, "inactive", shouldHideRightArrow);
+              toggleHidden($refs.arrowRight, shouldHideRightArrow);
+              if (shouldHideRightArrow && $refs.arrowRight.is(":focus")) {
+                $refs.arrowLeft.focus();
+              }
+              if ($refs.view) {
+                tram($refs.view).add("opacity .3s").start({
+                  opacity: 0
+                }).then(remover($refs.view));
+                tram($newView).add("opacity .3s").add("transform .3s").set({
+                  x: index > previousIndex ? "80px" : "-80px"
+                }).start({
+                  opacity: 1,
+                  x: 0
+                });
+              } else {
+                $newView.css("opacity", 1);
+              }
+              $refs.view = $newView;
+              $refs.view.prop("tabIndex", 0);
+              if ($refs.items) {
+                removeClass($refs.items, "active");
+                $refs.items.removeAttr("aria-selected");
+                var $activeThumb = $refs.items.eq(index);
+                addClass($activeThumb, "active");
+                $activeThumb.attr("aria-selected", true);
+                maybeScroll($activeThumb);
+              }
+            }
+          });
+          $refs.close.prop("tabIndex", 0);
+          $(":focus").addClass("active-lightbox");
+          if (resetVisibilityState.length === 0) {
+            $("body").children().each(function() {
+              if ($(this).hasClass("w-lightbox-backdrop") || $(this).is("script")) {
+                return;
+              }
+              resetVisibilityState.push({
+                node: $(this),
+                hidden: $(this).attr("aria-hidden"),
+                tabIndex: $(this).attr("tabIndex")
+              });
+              $(this).attr("aria-hidden", true).attr("tabIndex", -1);
+            });
+            $refs.close.focus();
+          }
+          return lightbox;
+        };
+        lightbox.hide = function() {
+          tram($refs.lightbox).add("opacity .3s").start({
+            opacity: 0
+          }).then(hideLightbox);
+          return lightbox;
+        };
+        lightbox.prev = function() {
+          var previousVisibleIndex = getPreviousVisibleIndex(currentIndex - 1, items);
+          if (previousVisibleIndex > -1) {
+            lightbox.show(previousVisibleIndex);
+          }
+        };
+        lightbox.next = function() {
+          var nextVisibleIndex = getNextVisibleIndex(currentIndex + 1, items);
+          if (nextVisibleIndex > -1) {
+            lightbox.show(nextVisibleIndex);
+          }
+        };
+        function createHandler(action) {
+          return function(event) {
+            if (this !== event.target) {
+              return;
+            }
+            event.stopPropagation();
+            event.preventDefault();
+            action();
+          };
+        }
+        var handlerPrev = createHandler(lightbox.prev);
+        var handlerNext = createHandler(lightbox.next);
+        var handlerHide = createHandler(lightbox.hide);
+        var itemTapHandler = function(event) {
+          var index = $(this).index();
+          event.preventDefault();
+          lightbox.show(index);
+        };
+        var swipeHandler = function(event, data) {
+          event.preventDefault();
+          if (data.direction === "left") {
+            lightbox.next();
+          } else if (data.direction === "right") {
+            lightbox.prev();
+          }
+        };
+        var focusThis = function() {
+          this.focus();
+        };
+        function preventDefault(event) {
+          event.preventDefault();
+        }
+        function keyHandler(event) {
+          var keyCode = event.keyCode;
+          if (keyCode === 27 || checkForFocusTrigger(keyCode, "close")) {
+            lightbox.hide();
+          } else if (keyCode === 37 || checkForFocusTrigger(keyCode, "left")) {
+            lightbox.prev();
+          } else if (keyCode === 39 || checkForFocusTrigger(keyCode, "right")) {
+            lightbox.next();
+          } else if (checkForFocusTrigger(keyCode, "item")) {
+            $(":focus").click();
+          }
+        }
+        function checkForFocusTrigger(keyCode, classMatch) {
+          if (keyCode !== 13 && keyCode !== 32) {
+            return false;
+          }
+          var currentElementClasses = $(":focus").attr("class");
+          var classToFind = prefixed(classMatch).trim();
+          return currentElementClasses.includes(classToFind);
+        }
+        function hideLightbox() {
+          if ($refs) {
+            $refs.strip.scrollLeft(0).empty();
+            removeClass($refs.html, "noscroll");
+            addClass($refs.lightbox, "hide");
+            $refs.view && $refs.view.remove();
+            removeClass($refs.content, "group");
+            addClass($refs.arrowLeft, "inactive");
+            addClass($refs.arrowRight, "inactive");
+            currentIndex = $refs.view = void 0;
+            resetVisibilityState.forEach(function(visibilityState) {
+              var node = visibilityState.node;
+              if (!node) {
+                return;
+              }
+              if (visibilityState.hidden) {
+                node.attr("aria-hidden", visibilityState.hidden);
+              } else {
+                node.removeAttr("aria-hidden");
+              }
+              if (visibilityState.tabIndex) {
+                node.attr("tabIndex", visibilityState.tabIndex);
+              } else {
+                node.removeAttr("tabIndex");
+              }
+            });
+            resetVisibilityState = [];
+            $(".active-lightbox").removeClass("active-lightbox").focus();
+          }
+        }
+        function loadImage(url, callback) {
+          var $image = dom("img", "img");
+          $image.one("load", function() {
+            callback($image);
+          });
+          $image.attr("src", url);
+          return $image;
+        }
+        function remover($element) {
+          return function() {
+            $element.remove();
+          };
+        }
+        function maybeScroll($item) {
+          var itemElement = $item.get(0);
+          var stripElement = $refs.strip.get(0);
+          var itemLeft = itemElement.offsetLeft;
+          var itemWidth = itemElement.clientWidth;
+          var stripScrollLeft = stripElement.scrollLeft;
+          var stripWidth = stripElement.clientWidth;
+          var stripScrollLeftMax = stripElement.scrollWidth - stripWidth;
+          var newScrollLeft;
+          if (itemLeft < stripScrollLeft) {
+            newScrollLeft = Math.max(0, itemLeft + itemWidth - stripWidth);
+          } else if (itemLeft + itemWidth > stripWidth + stripScrollLeft) {
+            newScrollLeft = Math.min(itemLeft, stripScrollLeftMax);
+          }
+          if (newScrollLeft != null) {
+            tram($refs.strip).add("scroll-left 500ms").start({
+              "scroll-left": newScrollLeft
+            });
+          }
+        }
+        function Spinner($spinner, className, delay) {
+          this.$element = $spinner;
+          this.className = className;
+          this.delay = delay || 200;
+          this.hide();
+        }
+        Spinner.prototype.show = function() {
+          var spinner2 = this;
+          if (spinner2.timeoutId) {
+            return;
+          }
+          spinner2.timeoutId = setTimeout(function() {
+            spinner2.$element.removeClass(spinner2.className);
+            delete spinner2.timeoutId;
+          }, spinner2.delay);
+        };
+        Spinner.prototype.hide = function() {
+          var spinner2 = this;
+          if (spinner2.timeoutId) {
+            clearTimeout(spinner2.timeoutId);
+            delete spinner2.timeoutId;
+            return;
+          }
+          spinner2.$element.addClass(spinner2.className);
+        };
+        function prefixed(string, isSelector) {
+          return string.replace(prefixRegex, (isSelector ? " ." : " ") + prefix);
+        }
+        function selector(string) {
+          return prefixed(string, true);
+        }
+        function addClass($element, className) {
+          return $element.addClass(prefixed(className));
+        }
+        function removeClass($element, className) {
+          return $element.removeClass(prefixed(className));
+        }
+        function toggleClass($element, className, shouldAdd) {
+          return $element.toggleClass(prefixed(className), shouldAdd);
+        }
+        function toggleHidden($element, isHidden) {
+          return $element.attr("aria-hidden", isHidden).attr("tabIndex", isHidden ? -1 : 0);
+        }
+        function dom(className, tag) {
+          return addClass($(document2.createElement(tag || "div")), className);
+        }
+        function svgDataUri(width, height) {
+          var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height + '"/>';
+          return "data:image/svg+xml;charset=utf-8," + encodeURI(svg);
+        }
+        (function() {
+          var ua2 = window2.navigator.userAgent;
+          var iOSRegex = /(iPhone|iPad|iPod);[^OS]*OS (\d)/;
+          var iOSMatches = ua2.match(iOSRegex);
+          var android = ua2.indexOf("Android ") > -1 && ua2.indexOf("Chrome") === -1;
+          if (!android && (!iOSMatches || iOSMatches[2] > 7)) {
+            return;
+          }
+          var styleNode = document2.createElement("style");
+          document2.head.appendChild(styleNode);
+          window2.addEventListener("resize", refresh, true);
+          function refresh() {
+            var vh = window2.innerHeight;
+            var vw = window2.innerWidth;
+            var content = ".w-lightbox-content, .w-lightbox-view, .w-lightbox-view:before {height:" + vh + "px}.w-lightbox-view {width:" + vw + "px}.w-lightbox-group, .w-lightbox-group .w-lightbox-view, .w-lightbox-group .w-lightbox-view:before {height:" + 0.86 * vh + "px}.w-lightbox-image {max-width:" + vw + "px;max-height:" + vh + "px}.w-lightbox-group .w-lightbox-image {max-height:" + 0.86 * vh + "px}.w-lightbox-strip {padding: 0 " + 0.01 * vh + "px}.w-lightbox-item {width:" + 0.1 * vh + "px;padding:" + 0.02 * vh + "px " + 0.01 * vh + "px}.w-lightbox-thumbnail {height:" + 0.1 * vh + "px}@media (min-width: 768px) {.w-lightbox-content, .w-lightbox-view, .w-lightbox-view:before {height:" + 0.96 * vh + "px}.w-lightbox-content {margin-top:" + 0.02 * vh + "px}.w-lightbox-group, .w-lightbox-group .w-lightbox-view, .w-lightbox-group .w-lightbox-view:before {height:" + 0.84 * vh + "px}.w-lightbox-image {max-width:" + 0.96 * vw + "px;max-height:" + 0.96 * vh + "px}.w-lightbox-group .w-lightbox-image {max-width:" + 0.823 * vw + "px;max-height:" + 0.84 * vh + "px}}";
+            styleNode.textContent = content;
+          }
+          refresh();
+        })();
+        return lightbox;
+      }
+      Webflow.define("lightbox", module.exports = function($) {
+        var api = {};
+        var inApp = Webflow.env();
+        var lightbox = createLightbox(window, document, $, inApp ? "#lightbox-mountpoint" : "body");
+        var $doc = $(document);
+        var $lightboxes;
+        var designer;
+        var namespace = ".w-lightbox";
+        var groups;
+        api.ready = api.design = api.preview = init;
+        function init() {
+          designer = inApp && Webflow.env("design");
+          lightbox.destroy();
+          groups = {};
+          $lightboxes = $doc.find(namespace);
+          $lightboxes.webflowLightBox();
+          $lightboxes.each(function() {
+            setAriaLabelIfEmpty($(this), "open lightbox");
+            $(this).attr("aria-haspopup", "dialog");
+          });
+        }
+        jQuery.fn.extend({
+          webflowLightBox: function() {
+            var $el = this;
+            $.each($el, function(i, el) {
+              var data = $.data(el, namespace);
+              if (!data) {
+                data = $.data(el, namespace, {
+                  el: $(el),
+                  mode: "images",
+                  images: [],
+                  embed: ""
+                });
+              }
+              data.el.off(namespace);
+              configure(data);
+              if (designer) {
+                data.el.on("setting" + namespace, configure.bind(null, data));
+              } else {
+                data.el.on("click" + namespace, clickHandler(data)).on("click" + namespace, function(e) {
+                  e.preventDefault();
+                });
+              }
+            });
+          }
+        });
+        function configure(data) {
+          var json = data.el.children(".w-json").html();
+          var groupName;
+          var groupItems;
+          if (!json) {
+            data.items = [];
+            return;
+          }
+          try {
+            json = JSON.parse(json);
+          } catch (e) {
+            console.error("Malformed lightbox JSON configuration.", e);
+          }
+          supportOldLightboxJson(json);
+          json.items.forEach(function(item) {
+            item.$el = data.el;
+          });
+          groupName = json.group;
+          if (groupName) {
+            groupItems = groups[groupName];
+            if (!groupItems) {
+              groupItems = groups[groupName] = [];
+            }
+            data.items = groupItems;
+            if (json.items.length) {
+              data.index = groupItems.length;
+              groupItems.push.apply(groupItems, json.items);
+            }
+          } else {
+            data.items = json.items;
+            data.index = 0;
+          }
+        }
+        function clickHandler(data) {
+          return function() {
+            data.items.length && lightbox(data.items, data.index || 0);
+          };
+        }
+        function supportOldLightboxJson(data) {
+          if (data.images) {
+            data.images.forEach(function(item) {
+              item.type = "image";
+            });
+            data.items = data.images;
+          }
+          if (data.embed) {
+            data.embed.type = "video";
+            data.items = [data.embed];
+          }
+          if (data.groupId) {
+            data.group = data.groupId;
+          }
+        }
+        return api;
+      });
+    }
+  });
+
   // packages/shared/render/plugins/Navbar/webflow-navbar.js
   var require_webflow_navbar = __commonJS({
     "packages/shared/render/plugins/Navbar/webflow-navbar.js"(exports, module) {
@@ -13962,6 +14502,7 @@
   require_webflow_scroll();
   require_webflow_touch();
   require_webflow_forms();
+  require_webflow_lightbox();
   require_webflow_navbar();
   require_webflow_slider();
 })();
@@ -13996,5 +14537,5 @@ timm/lib/timm.js:
  * Webflow: Interactions 2.0: Init
  */
 Webflow.require('ix2').init(
-{"events":{"e-5":{"id":"e-5","name":"","animationType":"custom","eventTypeId":"PAGE_START","action":{"id":"","actionTypeId":"GENERAL_START_ACTION","config":{"delay":0,"easing":"","duration":0,"actionListId":"a-3","affectedElements":{},"playInReverse":false,"autoStopEventId":"e-6"}},"mediaQueries":["main","medium","small","tiny"],"target":{"id":"666c1784844429bab318aa27","appliesTo":"PAGE","styleBlockIds":[]},"targets":[{"id":"666c1784844429bab318aa27","appliesTo":"PAGE","styleBlockIds":[]}],"config":{"loop":false,"playInReverse":false,"scrollOffsetValue":null,"scrollOffsetUnit":null,"delay":null,"direction":null,"effectIn":null},"createdOn":1720770845231}},"actionLists":{"a-3":{"id":"a-3","title":"PreLoader","actionItemGroups":[{"actionItems":[{"id":"a-3-n","actionTypeId":"GENERAL_DISPLAY","config":{"delay":0,"easing":"","duration":0,"target":{"id":"666c1784844429bab318aa27|b9016cda-64fa-e18f-8ead-31f1431148c9"},"value":"flex"}}]},{"actionItems":[{"id":"a-3-n-2","actionTypeId":"STYLE_OPACITY","config":{"delay":20000,"easing":"","duration":1000,"target":{"id":"666c1784844429bab318aa27|b9016cda-64fa-e18f-8ead-31f1431148c9"},"value":0,"unit":""}}]},{"actionItems":[{"id":"a-3-n-3","actionTypeId":"GENERAL_DISPLAY","config":{"delay":0,"easing":"","duration":0,"target":{"id":"666c1784844429bab318aa27|b9016cda-64fa-e18f-8ead-31f1431148c9"},"value":"none"}}]}],"useFirstGroupAsInitialState":true,"createdOn":1720770856873}},"site":{"mediaQueries":[{"key":"main","min":992,"max":10000},{"key":"medium","min":768,"max":991},{"key":"small","min":480,"max":767},{"key":"tiny","min":0,"max":479}]}}
+{"events":{"e-5":{"id":"e-5","name":"","animationType":"custom","eventTypeId":"PAGE_START","action":{"id":"","actionTypeId":"GENERAL_START_ACTION","config":{"delay":0,"easing":"","duration":0,"actionListId":"a-3","affectedElements":{},"playInReverse":false,"autoStopEventId":"e-6"}},"mediaQueries":["main","medium","small","tiny"],"target":{"id":"666c1784844429bab318aa27","appliesTo":"PAGE","styleBlockIds":[]},"targets":[{"id":"666c1784844429bab318aa27","appliesTo":"PAGE","styleBlockIds":[]}],"config":{"loop":false,"playInReverse":false,"scrollOffsetValue":null,"scrollOffsetUnit":null,"delay":null,"direction":null,"effectIn":null},"createdOn":1720770845231},"e-7":{"id":"e-7","name":"","animationType":"custom","eventTypeId":"MOUSE_CLICK","action":{"id":"","actionTypeId":"GENERAL_START_ACTION","config":{"delay":0,"easing":"","duration":0,"actionListId":"a-5","affectedElements":{},"playInReverse":false,"autoStopEventId":"e-8"}},"mediaQueries":["main","medium","small","tiny"],"target":{"id":"666c1784844429bab318aa27|6aa36f54-8aaa-5c06-6b80-6197091ef76e","appliesTo":"ELEMENT","styleBlockIds":[]},"targets":[{"id":"666c1784844429bab318aa27|6aa36f54-8aaa-5c06-6b80-6197091ef76e","appliesTo":"ELEMENT","styleBlockIds":[]}],"config":{"loop":false,"playInReverse":false,"scrollOffsetValue":null,"scrollOffsetUnit":null,"delay":null,"direction":null,"effectIn":null},"createdOn":1722005219951},"e-9":{"id":"e-9","name":"","animationType":"custom","eventTypeId":"MOUSE_CLICK","action":{"id":"","actionTypeId":"GENERAL_START_ACTION","config":{"delay":0,"easing":"","duration":0,"actionListId":"a-6","affectedElements":{},"playInReverse":false,"autoStopEventId":"e-10"}},"mediaQueries":["main","medium","small","tiny"],"target":{"id":"666c1784844429bab318aa27|03ea5d32-e9c8-f1bf-90f4-5c80ae1004be","appliesTo":"ELEMENT","styleBlockIds":[]},"targets":[{"id":"666c1784844429bab318aa27|03ea5d32-e9c8-f1bf-90f4-5c80ae1004be","appliesTo":"ELEMENT","styleBlockIds":[]}],"config":{"loop":false,"playInReverse":false,"scrollOffsetValue":null,"scrollOffsetUnit":null,"delay":null,"direction":null,"effectIn":null},"createdOn":1722005660479},"e-11":{"id":"e-11","name":"","animationType":"custom","eventTypeId":"MOUSE_CLICK","action":{"id":"","actionTypeId":"GENERAL_START_ACTION","config":{"delay":0,"easing":"","duration":0,"actionListId":"a-6","affectedElements":{},"playInReverse":false,"autoStopEventId":"e-12"}},"mediaQueries":["main","medium","small","tiny"],"target":{"id":"666c1784844429bab318aa27|c5c2ba21-201e-fe88-6bf3-9f9742b5ae06","appliesTo":"ELEMENT","styleBlockIds":[]},"targets":[{"id":"666c1784844429bab318aa27|c5c2ba21-201e-fe88-6bf3-9f9742b5ae06","appliesTo":"ELEMENT","styleBlockIds":[]}],"config":{"loop":false,"playInReverse":false,"scrollOffsetValue":null,"scrollOffsetUnit":null,"delay":null,"direction":null,"effectIn":null},"createdOn":1722005759903}},"actionLists":{"a-3":{"id":"a-3","title":"PreLoader","actionItemGroups":[{"actionItems":[{"id":"a-3-n","actionTypeId":"GENERAL_DISPLAY","config":{"delay":0,"easing":"","duration":0,"target":{"id":"666c1784844429bab318aa27|b9016cda-64fa-e18f-8ead-31f1431148c9"},"value":"flex"}}]},{"actionItems":[{"id":"a-3-n-2","actionTypeId":"STYLE_OPACITY","config":{"delay":20000,"easing":"","duration":1000,"target":{"id":"666c1784844429bab318aa27|b9016cda-64fa-e18f-8ead-31f1431148c9"},"value":0,"unit":""}}]},{"actionItems":[{"id":"a-3-n-3","actionTypeId":"GENERAL_DISPLAY","config":{"delay":0,"easing":"","duration":0,"target":{"id":"666c1784844429bab318aa27|b9016cda-64fa-e18f-8ead-31f1431148c9"},"value":"none"}}]}],"useFirstGroupAsInitialState":true,"createdOn":1720770856873},"a-5":{"id":"a-5","title":"Overlay-In","actionItemGroups":[{"actionItems":[{"id":"a-5-n","actionTypeId":"TRANSFORM_MOVE","config":{"delay":0,"easing":"","duration":500,"target":{"selector":".overlay-fullscreen-wrapper","selectorGuids":["fb3f169b-126c-ae0c-26d9-fc363972c483"]},"xValue":100,"xUnit":"%","yUnit":"PX","zUnit":"PX"}},{"id":"a-5-n-3","actionTypeId":"GENERAL_DISPLAY","config":{"delay":0,"easing":"","duration":0,"target":{"selector":".overlay-fullscreen-wrapper","selectorGuids":["fb3f169b-126c-ae0c-26d9-fc363972c483"]},"value":"none"}}]},{"actionItems":[{"id":"a-5-n-2","actionTypeId":"TRANSFORM_MOVE","config":{"delay":0,"easing":"inOutQuint","duration":1000,"target":{"selector":".overlay-fullscreen-wrapper","selectorGuids":["fb3f169b-126c-ae0c-26d9-fc363972c483"]},"xValue":0,"xUnit":"px","yUnit":"PX","zUnit":"PX"}},{"id":"a-5-n-4","actionTypeId":"GENERAL_DISPLAY","config":{"delay":0,"easing":"","duration":0,"target":{"selector":".overlay-fullscreen-wrapper","selectorGuids":["fb3f169b-126c-ae0c-26d9-fc363972c483"]},"value":"flex"}}]}],"useFirstGroupAsInitialState":true,"createdOn":1722005237866},"a-6":{"id":"a-6","title":"Overlay-Out","actionItemGroups":[{"actionItems":[{"id":"a-6-n","actionTypeId":"TRANSFORM_MOVE","config":{"delay":100,"easing":"inOutQuint","duration":2000,"target":{"useEventTarget":"PARENT","selector":".overlay-fullscreen-wrapper","selectorGuids":["fb3f169b-126c-ae0c-26d9-fc363972c483"]},"xValue":100,"xUnit":"%","yUnit":"PX","zUnit":"PX"}}]}],"useFirstGroupAsInitialState":false,"createdOn":1722005772682}},"site":{"mediaQueries":[{"key":"main","min":992,"max":10000},{"key":"medium","min":768,"max":991},{"key":"small","min":480,"max":767},{"key":"tiny","min":0,"max":479}]}}
 );
