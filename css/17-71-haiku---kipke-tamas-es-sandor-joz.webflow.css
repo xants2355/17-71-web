@@ -1888,6 +1888,7 @@ figcaption {
 
 .book-lightbox {
   border: 1px solid var(--base-color-brand--dark-grey);
+  overflow: hidden;
 }
 
 .overlay-fullscreen-kipke {
@@ -1987,6 +1988,16 @@ figcaption {
   left: auto;
   right: 0%;
   overflow: auto;
+}
+
+.spread-image {
+  transform: scale3d(1none, 1none, 1none);
+  transform-style: preserve-3d;
+  transition: transform .2s cubic-bezier(.77, 0, .175, 1);
+}
+
+.spread-image:hover {
+  transform: scale(1.1);
 }
 
 @media screen and (max-width: 991px) {
