@@ -1,10 +1,10 @@
 :root {
   --base-color-brand--background: #dbdbdc;
+  --text-color--text-secondary: var(--base-color-brand--dark-grey);
   --link-color--link-primary: var(--base-color-brand--black);
   --background-color--background-primary\<deleted\|variable-9f6b6bb4-0795-c8ab-f302-bbebab6f2554\>: var(--base-color-neutral--black);
   --text-color--text-alternate: var(--base-color-neutral--white);
   --text-color--text-primary: var(--base-color-neutral--black);
-  --text-color--text-secondary: var(--base-color-brand--dark-grey);
   --background-color--background-success\<deleted\|variable-879e2a57-3170-38fd-0ae7-d0e890873ab2\>: var(--base-color-system--success-green);
   --text-color--text-success: var(--base-color-system--success-green-dark);
   --border-color--border-primary\<deleted\|variable-d4c54ba4-ee41-67ce-58a5-5216ca039f83\>: var(--base-color-neutral--neutral-lightest);
@@ -107,7 +107,7 @@
 
 body {
   background-color: var(--base-color-brand--background);
-  color: #000;
+  color: var(--text-color--text-secondary);
   font-family: Acaslonpro, sans-serif;
   font-size: 1rem;
   font-weight: 400;
@@ -123,6 +123,7 @@ h1 {
 }
 
 h2 {
+  color: var(--text-color--text-secondary);
   margin-top: 0;
   margin-bottom: 0;
   font-size: 3rem;
@@ -164,6 +165,7 @@ h6 {
 }
 
 p {
+  color: var(--text-color--text-secondary);
   margin-bottom: 0;
   font-size: 1.125rem;
   font-style: italic;
@@ -589,10 +591,6 @@ figcaption {
 
 .text-color-primary {
   color: var(--text-color--text-primary);
-}
-
-.text-color-secondary {
-  color: var(--text-color--text-secondary);
 }
 
 .fs-styleguide_2-col {
@@ -1854,7 +1852,7 @@ figcaption {
 .header-events-wrapper {
   flex-flow: column;
   justify-content: flex-start;
-  align-items: center;
+  align-items: flex-end;
   display: flex;
 }
 
@@ -1862,7 +1860,7 @@ figcaption {
   flex-flow: column;
   flex: none;
   justify-content: flex-start;
-  align-items: flex-end;
+  align-items: center;
   max-width: 18rem;
   font-style: italic;
   text-decoration: none;
