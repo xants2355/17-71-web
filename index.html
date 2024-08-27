@@ -1,4 +1,4 @@
-<!DOCTYPE html><!--  This site was created in Webflow. https://webflow.com  --><!--  Last Published: Wed Jul 31 2024 10:40:13 GMT+0000 (Coordinated Universal Time)  -->
+<!DOCTYPE html><!--  This site was created in Webflow. https://webflow.com  --><!--  Last Published: Tue Aug 27 2024 12:48:47 GMT+0000 (Coordinated Universal Time)  -->
 <html data-wf-page="666c1784844429bab318aa27" data-wf-site="666c1784844429bab318a9f0" lang="hu">
 <head>
   <meta charset="utf-8">
@@ -184,7 +184,7 @@ margin: 0rem !important;
             <a href="#" class="nav_brand w-nav-brand"><img src="images/17-71-Brand-64px.svg" loading="lazy" alt="17-71 Képek, szavak logó" class="nav_logo">
               <div class="flex-vertical">
                 <h1 class="heading-style-h4">Képek, szavak</h1>
-                <h2 class="heading-style-h5 text-color-secondary">Kipke Tamás haikui és Sándor József Attila képei</h2>
+                <h2 class="heading-style-h5">Kipke Tamás haikui és Sándor József Attila képei</h2>
               </div>
             </a>
             <a href="#book-intro" class="header-book-recommendation w-inline-block"><img src="images/Book-Header-image.png" loading="lazy" alt="" class="header-book-image">
@@ -235,34 +235,70 @@ margin: 0rem !important;
           <a data-w-id="cdbefb09-e20c-d544-98df-a23715264723" href="#" class="button w-button">Bezárom</a>
         </div>
       </div>
-      <div class="container-large">
-        <section class="section_hero">
-          <div data-delay="0" data-animation="cross" class="hero-slider w-slider" data-autoplay="true" data-easing="ease-in-out-quart" data-hide-arrows="false" data-disable-swipe="false" data-autoplay-limit="0" data-nav-spacing="3" data-duration="1200" data-infinite="true">
-            <div class="mask w-slider-mask">
-              <div class="w-slide">
-                <div class="slide-wrapper">
-                  <div class="poem-tutle">(kiállítás)</div>
+      <section class="section_hero">
+        <div class="container-large">
+          <div class="hero-anim-slider_wrapper"><img src="images/17-71-header-animation.svg" loading="lazy" alt="">
+            <div data-delay="10000" data-animation="slide" class="hero-anim-slider w-slider" data-autoplay="true" data-easing="ease" data-hide-arrows="false" data-disable-swipe="false" data-autoplay-limit="0" data-nav-spacing="3" data-duration="0" data-infinite="true">
+              <div class="slider-mask w-slider-mask">
+                <div class="slide-wrapper w-slide">
+                  <div class="anim-item-wrapper">
+                    <div class="poem-number">[11]</div>
+                    <div class="poem-title">(kiállítás)</div>
+                    <p class="poem-content">amit látsz, nem a<br>kép: az te vagy – miután<br>láttad a képet</p><img sizes="100vw" srcset="images/01-Kiallitas-exhibition-image-p-500.png 500w, images/01-Kiallitas-exhibition-image-p-800.png 800w, images/01-Kiallitas-exhibition-image.png 1021w" alt="A Kállítás c. hailuhoz tartozó kép" src="images/01-Kiallitas-exhibition-image.png" loading="lazy" class="poem-picture">
+                  </div>
+                </div>
+                <div class="slide-wrapper w-slide">
+                  <div class="anim-item-wrapper">
+                    <div class="poem-number">[11]</div>
+                    <div class="poem-title">(jel)</div>
+                    <p class="poem-content">nem kőbe, fába<br>véstem – nem halott<br>betű: élő üzenet</p><img sizes="100vw" srcset="images/39-Sandor-Jozsef-Painting-p-500.png 500w, images/39-Sandor-Jozsef-Painting-p-800.png 800w, images/39-Sandor-Jozsef-Painting.png 1021w" alt="" src="images/39-Sandor-Jozsef-Painting.png" loading="lazy" class="poem-picture">
+                  </div>
+                </div>
+                <div class="w-slide">
+                  <div class="hero-anim-slider_wrapper">
+                    <div class="anim-item-wrapper">
+                      <div class="poem-number">[11]</div>
+                      <div class="poem-title">(jel)</div>
+                      <p class="poem-content">nem kőbe, fába<br>véstem – nem halott<br>betű: élő üzenet</p><img src="images/39-Sandor-Jozsef-Painting.png" loading="lazy" sizes="100vw" srcset="images/39-Sandor-Jozsef-Painting-p-500.png 500w, images/39-Sandor-Jozsef-Painting-p-800.png 800w, images/39-Sandor-Jozsef-Painting.png 1021w" alt="" class="poem-picture">
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="w-slide">
-                <div class="slide-wrapper">
-                  <p class="text-size-huge poem">amit látsz, nem a<br>kép: az te vagy – miután<br>láttad a képet</p>
+              <div class="left-arrow w-slider-arrow-left">
+                <div class="w-icon-slider-left"></div>
+              </div>
+              <div class="right-arrow w-slider-arrow-right">
+                <div class="w-icon-slider-right"></div>
+              </div>
+              <div class="slide-nav w-slider-nav w-round w-num"></div>
+            </div>
+            <div data-delay="0" data-animation="cross" class="hero-slider w-slider" data-autoplay="true" data-easing="ease-in-out-quart" data-hide-arrows="false" data-disable-swipe="false" data-autoplay-limit="0" data-nav-spacing="3" data-duration="1200" data-infinite="true">
+              <div class="mask w-slider-mask">
+                <div class="w-slide">
+                  <div class="slide-wrapper">
+                    <div class="poem-title">(kiállítás)</div>
+                  </div>
+                </div>
+                <div class="w-slide">
+                  <div class="slide-wrapper">
+                    <p class="text-size-huge poem">amit látsz, nem a<br>kép: az te vagy – miután<br>láttad a képet</p>
+                  </div>
+                </div>
+                <div class="w-slide">
+                  <div class="slide-wrapper"><img src="images/01-Kiallitas-exhibition-image.png" loading="lazy" sizes="100vw" srcset="images/01-Kiallitas-exhibition-image-p-500.png 500w, images/01-Kiallitas-exhibition-image-p-800.png 800w, images/01-Kiallitas-exhibition-image.png 1021w" alt="A Kállítás c. hailuhoz tartozó kép" class="haiku-image"></div>
                 </div>
               </div>
-              <div class="w-slide">
-                <div class="slide-wrapper"><img src="images/01-Kiallitas-exhibition-image.png" loading="lazy" sizes="(max-width: 479px) 96vw, (max-width: 1021px) 100vw, 1021px" srcset="images/01-Kiallitas-exhibition-image-p-500.png 500w, images/01-Kiallitas-exhibition-image-p-800.png 800w, images/01-Kiallitas-exhibition-image.png 1021w" alt="A Kállítás c. hailuhoz tartozó kép" class="haiku-image"></div>
+              <div class="left-arrow w-slider-arrow-left">
+                <div class="w-icon-slider-left"></div>
               </div>
+              <div class="right-arrow w-slider-arrow-right">
+                <div class="w-icon-slider-right"></div>
+              </div>
+              <div class="slide-nav w-slider-nav"></div>
             </div>
-            <div class="left-arrow w-slider-arrow-left">
-              <div class="w-icon-slider-left"></div>
-            </div>
-            <div class="right-arrow w-slider-arrow-right">
-              <div class="w-icon-slider-right"></div>
-            </div>
-            <div class="slide-nav w-slider-nav"></div>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
       <section class="section_descriptiom">
         <div class="padding-global padding-section-large">
           <div class="container-medium">
@@ -281,7 +317,7 @@ margin: 0rem !important;
               <div id="w-node-cc0709ae-82f7-3286-390c-ed352e2006a4-b318aa27" class="author-wrapper first-row">
                 <div class="w-layout-vflex authorname-description flex-align-right">
                   <h2 class="heading-style-h3">Kipke Tamás</h2>
-                  <p class="text-align-right">&quot;Magamat szeretném elmondani, (...) mert nem tudok mást mondani: amit látok és átélek, számomra ez a világ, a világom meg én magam vagyok, hiába határos a tiéd az enyémmel. (...) Nem tudom, milyennek látod az ablakod elé hajló ecetfát, ahogy nem tudom, milyen vagy azon kívül, amit én látok belőled, magammal tehát téged is átadlak neked – vissza a világnak a világot.&quot;</p>
+                  <p class="text_intro text-align-right">&quot;Magamat szeretném elmondani, (...) mert nem tudok mást mondani: amit látok és átélek, számomra ez a világ, a világom meg én magam vagyok, hiába határos a tiéd az enyémmel. (...) Nem tudom, milyennek látod az ablakod elé hajló ecetfát, ahogy nem tudom, milyen vagy azon kívül, amit én látok belőled, magammal tehát téged is átadlak neked – vissza a világnak a világot.&quot;</p>
                 </div>
                 <div class="portrait-image"><img src="images/Kipke_Tamas-portrait.jpg" loading="lazy" alt="Kipke Tamás portré" class="tamas-portrait"></div>
                 <div class="authors_link-block">Tamás haikui</div>
@@ -291,7 +327,7 @@ margin: 0rem !important;
                 <div class="portrait-image"><img src="images/sandor_jozsef-portrait.jpg" loading="lazy" alt="Sándor József Attila portré" class="sandor-portrait"></div>
                 <div class="w-layout-vflex authorname-description">
                   <h2 class="heading-style-h3">Sándor József Attila</h2>
-                  <p class="paragraph">A színek mindig magukkal ragadnak. Mindig más hangulatot, összhangot keresek. Színeim a nagybányai katlan árnyalatai, néha azon kapom magam, hogy még a kékek is melegek. A földszínek mindig nagy hatást gyakoroltak rám, a belső tűz, ami ezekből árad az, ami érdekel...</p>
+                  <p class="text_intro">A színek mindig magukkal ragadnak. Mindig más hangulatot, összhangot keresek. Színeim a nagybányai katlan árnyalatai, néha azon kapom magam, hogy még a kékek is melegek. A földszínek mindig nagy hatást gyakoroltak rám, a belső tűz, ami ezekből árad az, ami érdekel...</p>
                 </div>
               </div>
             </div>
