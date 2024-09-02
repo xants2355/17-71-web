@@ -2145,6 +2145,10 @@ figcaption {
   width: 100%;
 }
 
+.hero-anim-css_mob {
+  display: none;
+}
+
 @media screen and (max-width: 991px) {
   .padding-xlarge {
     padding: 3rem;
@@ -2789,6 +2793,12 @@ figcaption {
     font-size: 1.5rem;
   }
 
+  .nav_component {
+    background-color: var(--base-color-brand--background);
+    position: fixed;
+    top: 0;
+  }
+
   .nav_container {
     justify-content: center;
     align-items: center;
@@ -2807,13 +2817,14 @@ figcaption {
   }
 
   .section_hero {
+    height: 84svh;
     padding-top: 2.4rem;
     padding-bottom: 2.4rem;
     display: flex;
   }
 
   .nav_fixed {
-    height: 11rem;
+    height: auto;
     position: relative;
   }
 
@@ -3012,6 +3023,14 @@ figcaption {
   .poem-picture {
     align-self: auto;
     height: 60svw;
+  }
+
+  .hero-anim-css_desktop {
+    display: none;
+  }
+
+  .hero-anim-css_mob {
+    display: block;
   }
 }
 
